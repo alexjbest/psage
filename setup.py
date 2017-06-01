@@ -39,7 +39,7 @@ INCLUDES = ['%s/%s/'%(SAGE_ROOT,x) for x in
              ('devel/sage/sage/ext', 'devel/sage', 'devel/sage/sage/gsl',   \
               'src/build/cythonized/sage/ext', 'src')] \
          + ['%s/%s/'%(SAGE_LOCAL,x) for x in
-             ('include', 'include/python')]
+             ('include', 'include/python', 'lib/python2.7/site-packages/cysignals')] + ['../','../../','.','../../../','../../../../']
 if '-ba' in sys.argv:
     print "Rebuilding all Cython extensions."
     sys.argv.remove('-ba')
@@ -111,11 +111,12 @@ ext_modules = [
 #    Extension('psage.modform.maass.lpkbessel',
 #              ['psage/modform/maass/lpkbessel.pyx']),
 
-    Extension("psage.modform.rational.modular_symbol_map",
-              ["psage/modform/rational/modular_symbol_map.pyx"]),
 
-    Extension("psage.modform.rational.padic_elliptic_lseries_fast",
-              ["psage/modform/rational/padic_elliptic_lseries_fast.pyx"]),
+#    Extension("psage.modform.rational.modular_symbol_map",
+#              ["psage/modform/rational/modular_symbol_map.pyx"]),
+
+#    Extension("psage.modform.rational.padic_elliptic_lseries_fast",
+#              ["psage/modform/rational/padic_elliptic_lseries_fast.pyx"]),
 
     Extension("psage.modform.hilbert.sqrt5.sqrt5_fast",
               ["psage/modform/hilbert/sqrt5/sqrt5_fast.pyx"],
@@ -156,12 +157,12 @@ ext_modules = [
               ["psage/number_fields/sqrt5/prime.pyx"],
               libraries = ['pari']),
 
-    Extension("psage.modform.rational.special_fast",
-              ["psage/modform/rational/special_fast.pyx"],
-              libraries = ['gmp', 'flint'],
-              language = 'c++',
-              include_dirs = [SAGE_LOCAL + '/include/FLINT/', SAGE_ROOT + '/devel/sage/sage/libs/flint/'],
-              extra_compile_args = ['-std=c99']),
+#    Extension("psage.modform.rational.special_fast",
+#              ["psage/modform/rational/special_fast.pyx"],
+#              libraries = ['gmp', 'flint'],
+#              language = 'c++',
+#              include_dirs = [SAGE_LOCAL + '/include/FLINT/', SAGE_ROOT + '/devel/sage/sage/libs/flint/'],
+#              extra_compile_args = ['-std=c99']),
 
     Extension("psage.ellcurve.xxx.rankbound",
               sources = [   'psage/ellcurve/xxx/rankbound.pyx',
