@@ -39,7 +39,8 @@ TODO:
 import copy, math, types
 
 from sage.all import prime_range, cached_method, sqrt, SR, vector
-from sage.rings.all import is_RationalField, ZZ, Integer, QQ, O, ComplexField, CDF, primes, infinity as oo
+from sage.rings.all import ZZ, Integer, QQ, O, ComplexField, CDF, primes, infinity as oo
+from sage.rings.rational_field import is_RationalField
 from sage.schemes.elliptic_curves.ell_generic import is_EllipticCurve
 from psage.ellcurve.lseries.helper import extend_multiplicatively_generic
 from sage.misc.all import prod
@@ -466,8 +467,11 @@ class LSeriesAbstract(object):
             try:
                 self._function(prec=prec)
                 valid = True
-            except RuntimeError:
+            except RuntimeError as e:
+                print e
                 pass
+        except Exception as e:
+            print e
         finally:
             if not save:
                 for k, v in old:
@@ -1409,9 +1413,11 @@ class LSeriesAbstract(object):
             eps = 'X'
         else:
             eps = epsilon
-        return Dokchitser(conductor = self.conductor(), gammaV = self.hodge_numbers(), weight = self.weight(),
+        dok = Dokchitser(conductor = self.conductor(), gammaV = self.hodge_numbers(), weight = self.weight(),
                        eps = eps, poles = self.poles(), residues = self.residues(),
                        prec = prec)
+        dok.set_coeff_growth('sqrt(1024*n)')
+        return dok
 
     def number_of_coefficients(self, prec=53, T=1.2):
         """
@@ -1441,7 +1447,7 @@ class LSeriesAbstract(object):
         
         # Find out how many coefficients of the Dirichlet series are needed
         # to compute to the requested precision.
-        n = L.num_coeffs(T=T)
+        n = max(L.num_coeffs(T=T),L.num_coeffs(T=1.3))
         #if n >= 500:   # TODO: for debugging only -- remove later
         #    print "num coeffs =", n
 
@@ -1459,17 +1465,18 @@ class LSeriesAbstract(object):
             # Define a string that when evaluated in PARI defines a function
             # a(k), which returns the Dirichlet coefficient a_k.
             s = 'v=[%s]; a(k)=v[k];'%','.join([str(z) if isinstance(z, (int,long,Integer)) else z._pari_init_() for z in coeffs[1:]])
+            #L._gp_eval("MaxAsympCoeffs = 160")
 
             # Tell the L-series / PARI about the coefficients.
 
             if self.is_selfdual():
-                L.init_coeffs('a(k)', pari_precode = s)
+                L.init_coeffs('a(k)', pari_precode = s, cutoff=1.3)
             else:
                 # Have to directly call gp_eval, since case of functional equation having two different
                 # (conjugate) L-functions isn't supported in Dokchitser class (yet).
                 L._Dokchitser__init = True
                 L._gp_eval(s)
-                L._gp_eval('initLdata("a(k)",1,"conj(a(k))")')
+                L._gp_eval('initLdata("a(k)",1.3,"conj(a(k))")')
 
             if epsilon == 'solve':
                 cmd = "sgneq = Vec(checkfeq()); sgn = -sgneq[2]/sgneq[1]; sgn"
@@ -1497,7 +1504,7 @@ class LSeriesAbstract(object):
         raise RuntimeError, "invalid L-series parameters: functional equation not satisfied"
 
     def check_functional_equation(self, T, prec=53):
-        return self._function(prec=prec).check_functional_equation(T)
+        return self._function(prec=prec,T=T).check_functional_equation(T)
 
 class LSeriesProductEvaluator(object):
     def __init__(self, factorization, prec):
@@ -1968,15 +1975,17 @@ class LSeriesEllipticCurveSqrt5(LSeriesEllipticCurve):
         if self._lf.has_key(P):
             return self._lf[P]
         else:
-            return LSeriesEllipticCurve._local_factor(self, P.sage_ideal())
+            return LSeriesEllipticCurve._local_factor(self, P.sage_ideal(), prec)
 
+    @cached_method
     def _primes_above(self, p):
         """
         Return the primes above p.  This function returns a special
         optimized prime of the ring of integers of Q(sqrt(5)).
         """
         from psage.number_fields.sqrt5.prime import primes_above
-        return primes_above(p)
+        return [wp.sage_ideal() for wp in primes_above(p)]
+        #return primes_above(p)
 
 class LSeriesDedekindZeta(LSeriesAbstract):
     """
@@ -2453,7 +2462,7 @@ class LSeriesTwist(LSeriesAbstract):
                 # TODO: improve this using the theorem stated
                 # on page 1 of http://wstein.org/papers/padictwist/
                 #
-                conductor = [smallest*d for d in divisors(biggest//smallest)]
+                conductor = [smallest*d for d in (biggest//smallest).divisors()]
             else:
                 conductor = A * (B**L.degree())
         hodge_numbers = L.hodge_numbers()
@@ -2469,7 +2478,7 @@ class LSeriesTwist(LSeriesAbstract):
                     epsilon = 'solve'
             else:
                 epsilon = 'solve'
-        is_selfdual = L.is_selfdual()
+        is_selfdual = L.is_selfdual() and chi.order() <= 2
         poles = [] # ???  TODO -- no clue here.
         residues = 'automatic'
         base_field = L.base_field()
@@ -2481,9 +2490,22 @@ class LSeriesTwist(LSeriesAbstract):
         chi = self._chi
         T = L0.parent().gen()
         c = chi(P)
+        # So we don't try and root 0
         if prec is not None:
             c = ComplexField(prec)(c)
-        return L0(c*T)
+        cpow = 1
+        factor = L0.list()
+        for i,a in enumerate(factor):
+            if (i % P.residue_class_degree()) != 0:
+                continue
+            factor[i] = cpow * a
+            cpow *= c
+        return L0.parent().base_extend(c.parent())(factor) 
+        #return L0((c**(1/P.residue_class_degree()))*T)
+
+    def _precompute_local_factors(self, bound, prec):
+        L = self._L
+        L._precompute_local_factors(bound, prec)
 
     def __repr__(self):
         return "Twist of %s by %s"%(self._L, self._chi)
@@ -2496,6 +2518,9 @@ class LSeriesTwist(LSeriesAbstract):
 
     def twist_character(self):
         return self._chi
+
+    def _primes_above(self, p): # TODO this will probably break for non-sqrt5 now
+        return self._L._primes_above(p)
 
 ##############
 # TODO: General tensor products and symmetric powers: see
