@@ -32,6 +32,18 @@ if sys.maxint != 2**63 - 1:
     print "*"*70
     sys.exit(1)
 
+
+import build_system
+
+#SAGE_ROOT = os.environ['SAGE_ROOT']
+#SAGE_LOCAL = os.environ['SAGE_LOCAL']
+
+#INCLUDES = ['%s/%s/'%(SAGE_ROOT,x) for x in
+#             ('devel/sage/sage/ext', 'devel/sage', 'devel/sage/sage/gsl',   \
+#              'src/build/cythonized/sage/ext', 'src')] \
+#         + ['%s/%s/'%(SAGE_LOCAL,x) for x in
+#             ('include', 'include/python', 'lib/python2.7/site-packages/cysignals')] + ['../','../../','.','../../../','../../../../']
+
 if '-ba' in sys.argv:
     print "Rebuilding all Cython extensions."
     sys.argv.remove('-ba')
@@ -61,7 +73,6 @@ if DEVEL:
 if subprocess.call("""$CC --version | grep -i 'gcc.* 4[.]8' >/dev/null """, shell=True) == 0:
     extra_compile_args.append('-fno-tree-dominator-opts')
 
-    
 lib_headers = { "gmp":     [ os.path.join(SAGE_INC, 'gmp.h') ],   # cf. #8664, #9896
                 "gmpxx":   [ os.path.join(SAGE_INC, 'gmpxx.h') ],
                 "ntl":     [ os.path.join(SAGE_INC, 'NTL', 'config.h') ]
@@ -149,8 +160,6 @@ code = setup(
 
 #                'psage.function_fields',
                 'psage.groups',
-                
-                
                 'psage.lmfdb',
                 'psage.lmfdb.ellcurves',
                 'psage.lmfdb.ellcurves.sqrt5',
@@ -160,22 +169,22 @@ code = setup(
                 'psage.modform',
                 'psage.modform.arithgroup',
 
-                'psage.modform.fourier_expansion_framework',
-                'psage.modform.fourier_expansion_framework.gradedexpansions',
-                'psage.modform.fourier_expansion_framework.modularforms',
-                'psage.modform.fourier_expansion_framework.monoidpowerseries',
+                #'psage.modform.fourier_expansion_framework',
+                #'psage.modform.fourier_expansion_framework.gradedexpansions',
+                #'psage.modform.fourier_expansion_framework.modularforms',
+                #'psage.modform.fourier_expansion_framework.monoidpowerseries',
 
                 'psage.modform.hilbert',
                 'psage.modform.hilbert.sqrt5',
 
                 'psage.modform.rational',
 
-                'psage.modform.siegel',
+                #'psage.modform.siegel',
                 'psage.modform.jacobi',
                 'psage.modform.vector_valued',
-                'psage.modform.jacobiforms',
+                #'psage.modform.jacobiforms',
                 'psage.modform.weilrep_tools',
-                'psage.modform.maass',
+                #'psage.modform.maass',
                 'psage.modform.periods',
 
         		'psage.modules',
@@ -183,8 +192,8 @@ code = setup(
                 'psage.number_fields',
                 'psage.number_fields.sqrt5',
 
-                'psage.rh',
-                'psage.rh.mazur_stein',
+                #'psage.rh',
+                #'psage.rh.mazur_stein'
                 'psage.rings',
                 'psage.zfunctions'
                 ],
