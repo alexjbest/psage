@@ -27,19 +27,20 @@ All the code in this file is meant to be highly optimized.
 
 from cysignals.memory cimport sig_free,sig_malloc
 from cysignals.signals cimport sig_on,sig_off
-from sage.libs.gmp.all cimport *
-from stdsage cimport PY_NEW
+from sage.ext.stdsage cimport PY_NEW
 
 from cpython cimport *
 from sqrt5_fast cimport residue_element
+from sage.libs.gmp.all cimport *
+
+
+from sqrt5 import F
+
+from sage.rings.integer cimport Integer
 
 from sage.rings.all import Integers, ZZ, QQ
 from sage.rings.ideal import is_Ideal
 from sage.matrix.all import MatrixSpace, zero_matrix
-
-from sage.rings.integer cimport Integer
-
-from sqrt5 import F
 
 cdef Integer temp1 = Integer(0)
 
@@ -51,7 +52,7 @@ def is_ideal_in_F(I):
     return is_Ideal(I) and I.number_field() is F
 
 cpdef long ideal_characteristic(I):
-    return I.number_field()._pari_().idealtwoelt(I._pari_())[0]
+    return I.number_field().__pari__().idealtwoelt(I.__pari__())[0]
 
 ###########################################################################
 # Logging
@@ -414,7 +415,7 @@ cdef class ResidueRing_split(ResidueRing_abstract):
         return 0 # success
 
     def __reduce__(self):
-        return ResidueRing_split, (self.P, self.p, self.e)
+        return ResidueRing, (self.P, self.p, self.e)
 
     cdef object element_to_residue_field(self, residue_element x):
         return self.residue_field()(x[0])
@@ -516,7 +517,7 @@ cdef class ResidueRing_nonsplit(ResidueRing_abstract):
         self.coefficients(&r[0], &r[1], x)
 
     def __reduce__(self):
-        return ResidueRing_nonsplit, (self.P, self.p, self.e)
+        return ResidueRing, (self.P, self.p, self.e)
 
     cdef object element_to_residue_field(self, residue_element x):
         k = self.residue_field()
@@ -894,7 +895,7 @@ cdef class ResidueRing_ramified_odd(ResidueRing_abstract):
         return 0 # success
 
     def __reduce__(self):
-        return ResidueRing_ramified_odd, (self.P, self.p, self.e)
+        return ResidueRing, (self.P, self.p, self.e)
 
     cdef object element_to_residue_field(self, residue_element x):
         k = self.residue_field()
@@ -1063,7 +1064,6 @@ cdef inline bint _rich_to_bool(int op, int r):  # copied from sage.structure.ele
     elif op == Py_GE: #>=
         return (r >= 0)
 
-
 cdef class ResidueRingElement:
     cpdef parent(self):
         return self._parent
@@ -1124,6 +1124,10 @@ cdef class ResidueRingElement:
 
     def __hash__(self):
         return self.x[0] + self._parent.n0*self.x[1]
+
+
+    def __reduce__(self):
+        return 0
 
     cpdef bint is_unit(self):
         return self._parent.is_unit(self.x)
@@ -2085,7 +2089,7 @@ cpdef object quaternion_in_terms_of_icosian_basis(object alpha):
 ####################################################################
 cdef class ModN_Reduction:
     cdef ResidueRingModN S
-    cdef modn_matrix G[4]
+    cdef modn_matrix *G
     cdef bint is_odd
     def __init__(self, N, bint init=True):
         cdef int i
@@ -2096,6 +2100,7 @@ cdef class ModN_Reduction:
         cdef ResidueRingModN S = ResidueRingModN(N)
         self.S = S
         self.is_odd =  (N.norm() % 2 != 0)
+        G = <modn_matrix*> sig_malloc(sizeof(modn_matrix) * 4)
 
         if init:
             # Set the identity matrix (2 part of this will get partly overwritten when N is even.)
@@ -2103,6 +2108,9 @@ cdef class ModN_Reduction:
 
             for i in range(S.r):
                 self.compute_ith_local_splitting(i)
+
+    def __dealloc__(self):
+        sig_free(self.G)
 
     def reduce_exponent_of_ith_factor(self, i):
         """
@@ -2533,7 +2541,7 @@ cdef class IcosiansModP1ModN:
             sage: t*s == s*t
             True
         """
-        if ZZ(self.level().norm()).gcd(ZZ(P.norm())) != 1:
+        if Integer(self.level().norm()).gcd(Integer(P.norm())) != 1:
             return self._hecke_matrix_badnorm(P, sparse=sparse)
         cdef modn_matrix M
         cdef p1_element Mx
@@ -2630,7 +2638,7 @@ cdef class IcosiansModP1ModN:
         cdef list Q = hecke_elements(P)
         v = (ZZ**self._cardinality)(0)  # important -- do not use the vector function to make this: see trac 11657.
 
-        if ZZ(self.level().norm()).gcd(ZZ(P.norm())) == 1:
+        if Integer(self.level().norm()).gcd(Integer(P.norm())) == 1:
             for alpha in Q:
                 self.f.quatalg_to_modn_matrix(M, alpha)
                 self.P1.matrix_action(Mx, M, self.orbit_reps_p1elt[i])

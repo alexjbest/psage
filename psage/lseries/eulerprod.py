@@ -39,7 +39,8 @@ TODO:
 import copy, math, types
 
 from sage.all import prime_range, cached_method, sqrt, SR, vector
-from sage.rings.all import ZZ, Integer, QQ, O, ComplexField, CDF, primes, infinity as oo
+from sage.arith.all import primes
+from sage.rings.all import ZZ, Integer, QQ, O, ComplexField, CDF, infinity as oo
 from sage.rings.rational_field import is_RationalField
 from sage.schemes.elliptic_curves.ell_generic import is_EllipticCurve
 from psage.ellcurve.lseries.helper import extend_multiplicatively_generic
@@ -1183,7 +1184,7 @@ class LSeriesAbstract(object):
                         compute_anlist_multiple = True
                     lf.append(F)
             LF.append((p, lf))
-                        
+
         coefficients = self._compute_anlist(LF, bound, prec)
         if not compute_anlist_multiple:
             coefficients = list(coefficients)[0]
@@ -1428,10 +1429,10 @@ class LSeriesAbstract(object):
 
         INPUT:
             - prec -- integer
-        
+
         EXAMPLES::
 
-            sage: from psage.lseries.eulerprod import LSeries        
+            sage: from psage.lseries.eulerprod import LSeries
             sage: L = LSeries(DirichletGroup(5).0)
             sage: L.number_of_coefficients(20)
             8
@@ -1444,7 +1445,7 @@ class LSeriesAbstract(object):
 
     def _dokchitser(self, prec, epsilon, T=1.2):
         L = self._dokchitser_unitialized(prec, epsilon)
-        
+
         # Find out how many coefficients of the Dirichlet series are needed
         # to compute to the requested precision.
         n = max(L.num_coeffs(T=T),L.num_coeffs(T=1.3))
@@ -1476,11 +1477,13 @@ class LSeriesAbstract(object):
                 # (conjugate) L-functions isn't supported in Dokchitser class (yet).
                 L._Dokchitser__init = True
                 L._gp_eval(s)
-                L._gp_eval('initLdata("a(k)",1.3,"conj(a(k))")')
+                L._gp_call_inst('initLdata','"a(k)",1.3,"conj(a(k))"')
 
             if epsilon == 'solve':
-                cmd = "sgneq = Vec(checkfeq()); sgn = -sgneq[2]/sgneq[1]; sgn"
-                epsilon = ComplexField(prec)(L._gp_eval(cmd))
+                epsvec = L._gp_call_inst("checkfeq")
+                L._gp_eval('sgneq = Vec(%s)' % epsvec)
+                epsilon = ComplexField(prec)( L._gp_set_inst('sgn', '-sgneq[2]/sgneq[1]'))
+
                 if abs(abs(epsilon)-1) > tiny0:
                     raise RuntimeError, "unable to determine epsilon from functional equation working to precision %s, since we get epsilon=%s, which is not sufficiently close to 1"%(prec, epsilon)
                 # 1, -1 are two common special cases, where it is clear what the
@@ -1499,7 +1502,7 @@ class LSeriesAbstract(object):
                 return L
             else:
                 pass
-            
+
         # They all failed.
         raise RuntimeError, "invalid L-series parameters: functional equation not satisfied"
 
@@ -1542,7 +1545,7 @@ class LSeriesProduct(object):
     def is_selfdual(self):
         """
         Return True if every factor of self is self dual; otherwise, return False.
-        
+
         EXAMPLES::
 
             sage: from psage.lseries.eulerprod import LSeries
@@ -1596,7 +1599,7 @@ class LSeriesProduct(object):
     def __pow__(self, n):
         """
         Return the n-th power of this formal L-series product, where n can be any integer.
-        
+
         EXAMPLES::
 
             sage: from psage.lseries.eulerprod import LSeries
@@ -1634,7 +1637,7 @@ class LSeriesProduct(object):
 
     def parent(self):
         return LSeriesParent
-    
+
     def factor(self):
         return self._factorization
 

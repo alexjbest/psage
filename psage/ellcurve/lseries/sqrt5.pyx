@@ -21,7 +21,7 @@
 
 #### WARNING #### WARNING #### WARNING #####
 ##
-# This file is now largely irrelevant and replaced by aplist_sqrt5.pyx
+## This file is now largely irrelevant and replaced by aplist_sqrt5.pyx
 ##
 #### WARNING #### WARNING #### WARNING #####
 
@@ -113,7 +113,7 @@ from sage.all import prime_range, pari, verbose, get_verbose, prime_pi
 
 from psage.libs.smalljac.wrapper1 import elliptic_curve_ap
 
-import aplist
+from psage.ellcurve.lseries import aplist
 
 from cysignals.memory cimport sig_free,sig_malloc
 from cysignals.signals cimport sig_on,sig_off

@@ -30,10 +30,10 @@ def ellcurves_sqrt5(address='localhost:29000', username=None, password=None):
     if username is None or password is None:
         from psage.lmfdb.auth import userpass
         username, password = userpass()
-        
+
     if not C.authenticate(username, password):
         raise RuntimeError, "failed to authenticate"
-    
+
     return C.ellcurves_sqrt5
 
 def find_isogeneous_curves(ellcurves_sqrt5, E):
@@ -45,7 +45,7 @@ def find_isogeneous_curves(ellcurves_sqrt5, E):
         - cursor iterating over entries in the collection that have
           the same good a_p, for p of norm up to 100.
     """
-    from aplists import aplist
+    from .aplists import aplist
     w = aplist(E, 100)
     v = dict([('ap.%s'%p, a) for p, a in w.items()])
     from psage.modform.hilbert.sqrt5.tables import canonical_gen    

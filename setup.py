@@ -105,11 +105,11 @@ def run_cythonize():
         Cython.Compiler.Main.default_options['output_dir'] = 'build'
         gdb_debug=True
 
-    profile = False    
+    profile = False
     if os.environ.get('SAGE_PROFILE', None) == 'yes':
         print('Enabling Cython profiling support')
         profile = True
-   
+
     # Sage uses these directives (mostly for historical reasons).
     Cython.Compiler.Options.embed_pos_in_docstring = True
     Cython.Compiler.Options.get_directive_defaults()['autotestdict'] = False
@@ -175,7 +175,7 @@ code = setup(
                 #'psage.modform.fourier_expansion_framework.monoidpowerseries',
 
                 'psage.modform.hilbert',
-                'psage.modform.hilbert.sqrt5',
+                #'psage.modform.hilbert.sqrt5',
 
                 'psage.modform.rational',
 
@@ -187,7 +187,7 @@ code = setup(
                 #'psage.modform.maass',
                 'psage.modform.periods',
 
-        		'psage.modules',
+                'psage.modules',
 
                 'psage.number_fields',
                 'psage.number_fields.sqrt5',

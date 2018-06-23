@@ -34,7 +34,7 @@ class Extension(setuptools.extension.Extension):
         #print "kwds=",kwds
         #print "module=",module
         setuptools.Extension.__init__(self, name, sources, language=language,
-                                       include_dirs=include_dirs, **kwds)         
+                                       include_dirs=include_dirs, **kwds)
 #     def __init__(self, module, sources, include_dirs,
 #                  language="c", force=False, **kwds):
 #         self.cython_cmds = []
@@ -97,7 +97,6 @@ ext_modules = [
               libraries = ['m', 'gmp','mpfr','mpc','ntl'],
               include_dirs = numpy_include_dirs),
 
-              
     Extension("psage.modform.rational.modular_symbol_map",
               ["psage/modform/rational/modular_symbol_map.pyx"]),
 
@@ -106,7 +105,7 @@ ext_modules = [
 
     Extension("psage.modform.hilbert.sqrt5.sqrt5_fast",
               ["psage/modform/hilbert/sqrt5/sqrt5_fast.pyx"],
-#              libraries = ['ntl', 'gmp'],
+              #libraries = ['ntl', 'gmp'],
               libraries = ['gmp'],
               language = 'c++'),
 
@@ -242,63 +241,61 @@ my_extensions = [
               include_dirs = numpy_include_dirs,
               extra_compile_args=['-fopenmp'],
               extra_link_args=['-fopenmp']),
-              
-    
-    Extension('psage.modform.maass.vv_harmonic_weak_maass_forms_alg',
-              ['psage/modform/maass/vv_harmonic_weak_maass_forms_alg.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              include_dirs = numpy_include_dirs),
-    Extension('psage.modform.maass.maass_forms_phase2',
-                  sources=['psage/modform/maass/maass_forms_phase2.pyx'],
-                  libraries = ['m','gmp','mpfr','mpc'],
-                  include_dirs = numpy_include_dirs),
-    Extension('psage.modform.maass.lpkbessel',
-              ['psage/modform/maass/lpkbessel.pyx']),
-    Extension('psage.modules.vector_complex_dense',
-              sources = ['psage/modules/vector_complex_dense.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              include_dirs = numpy_include_dirs),
-    Extension('psage.modules.vector_real_mpfr_dense',
-              sources = ['psage/modules/vector_real_mpfr_dense.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              include_dirs = numpy_include_dirs),
-    
-    Extension('psage.modules.weil_module_alg',
-              sources = ['psage/modules/weil_module_alg.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              include_dirs = numpy_include_dirs),
-    Extension('psage.matrix.matrix_complex_dense',
-              sources = ['psage/matrix/matrix_complex_dense.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              extra_compile_args=['-fopenmp'],
-              extra_link_args=['-fopenmp'],
-              include_dirs = numpy_include_dirs),
 
-    Extension('psage.matrix.linalg_complex_dense',
-              sources = ['psage/matrix/linalg_complex_dense.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              extra_compile_args=['-fopenmp'],
-              extra_link_args=['-fopenmp']),
-    Extension('psage.modform.maass.poincare_series_alg',
-                  ['psage/modform/maass/poincare_series_alg.pyx'],
-              libraries = ['m','gmp','mpfr','mpc']),
-    
-    Extension('psage.modform.maass.poincare_series_alg_vv',
-          ['psage/modform/maass/poincare_series_alg_vv.pyx'],
-          libraries = ['m','gmp','mpfr','mpc']),
-        
-    Extension('psage.modform.maass.eisenstein_series',
-              ['psage/modform/maass/eisenstein_series.pyx'],
-              libraries = ['m','gmp','mpfr','mpc'],
-              include_dirs = numpy_include_dirs),
+#    Extension('psage.modform.maass.vv_harmonic_weak_maass_forms_alg',
+#              ['psage/modform/maass/vv_harmonic_weak_maass_forms_alg.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              include_dirs = numpy_include_dirs),
+#    Extension('psage.modform.maass.maass_forms_phase2',
+#                  sources=['psage/modform/maass/maass_forms_phase2.pyx'],
+#                  libraries = ['m','gmp','mpfr','mpc'],
+#                  include_dirs = numpy_include_dirs),
+#    Extension('psage.modform.maass.lpkbessel',
+#              ['psage/modform/maass/lpkbessel.pyx']),
+#    Extension('psage.modules.vector_complex_dense',
+#              sources = ['psage/modules/vector_complex_dense.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              include_dirs = numpy_include_dirs),
+#    Extension('psage.modules.vector_real_mpfr_dense',
+#              sources = ['psage/modules/vector_real_mpfr_dense.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              include_dirs = numpy_include_dirs),
+#    
+#    Extension('psage.modules.weil_module_alg',
+#              sources = ['psage/modules/weil_module_alg.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              include_dirs = numpy_include_dirs),
+#    Extension('psage.matrix.matrix_complex_dense',
+#              sources = ['psage/matrix/matrix_complex_dense.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              extra_compile_args=['-fopenmp'],
+#              extra_link_args=['-fopenmp'],
+#              include_dirs = numpy_include_dirs),
+#
+#    Extension('psage.matrix.linalg_complex_dense',
+#              sources = ['psage/matrix/linalg_complex_dense.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              extra_compile_args=['-fopenmp'],
+#              extra_link_args=['-fopenmp']),
+#    Extension('psage.modform.maass.poincare_series_alg',
+#                  ['psage/modform/maass/poincare_series_alg.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc']),
+#
+#    Extension('psage.modform.maass.poincare_series_alg_vv',
+#          ['psage/modform/maass/poincare_series_alg_vv.pyx'],
+#          libraries = ['m','gmp','mpfr','mpc']),
+#
+#    Extension('psage.modform.maass.eisenstein_series',
+##              ['psage/modform/maass/eisenstein_series.pyx'],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              include_dirs = numpy_include_dirs),
 
-    Extension("psage.modform.maass.test_parallel",
-              sources = [ 'psage/modform/maass/test_parallel.pyx' ],
-              libraries = ['m','gmp','mpfr','mpc'],
-              extra_compile_args=['-fopenmp'],
-              extra_link_args=['-fopenmp']),
-
-
+#    Extension("psage.modform.maass.test_parallel",
+#              sources = [ 'psage/modform/maass/test_parallel.pyx' ],
+#              libraries = ['m','gmp','mpfr','mpc'],
+#              extra_compile_args=['-fopenmp'],
+#              extra_link_args=['-fopenmp']),
+#
     Extension("psage.groups.dirichlet_conrey",
               ['psage/groups/dirichlet_conrey.pyx'],
               extra_compile_args = ['-w','-O2'])

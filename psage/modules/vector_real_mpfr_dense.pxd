@@ -1,5 +1,5 @@
-include '../ext/stdsage.pxi'
-include '../ext/cdefs.pxi'
+#include '../ext/stdsage.pxi'
+#include '../ext/cdefs.pxi'
 #include "../rings/mpc.pxi"
 #include "../ext/gmp.pxi"
 
