@@ -46,10 +46,8 @@ from sage.rings.integer cimport Integer
 
 from psage.libs.smalljac.wrapper1 import elliptic_curve_ap
 
-from psage.number_fields.sqrt5.prime import primes_of_bounded_norm
-
 from psage.modform.hilbert.sqrt5.sqrt5_fast cimport ResidueRing_abstract, residue_element
-from psage.modform.hilbert.sqrt5.sqrt5_fast import ResidueRing
+
 
 def short_weierstrass_invariants(E):
     """
@@ -148,6 +146,7 @@ def aplist(E, bound, fast_only=False):
         sage: aplist(E, 50)
         [-3, 1, 1, -4, -4, 4, 4, -2, -2, 0, 0, 10, 10, -14]
     """
+    from psage.number_fields.sqrt5.prime import primes_of_bounded_norm
     if list(E.base_field().defining_polynomial()) != [-1,-1,1]:
         raise ValueError, "E must have base field with defining polynomial x^2-x-1"
     A, B = short_weierstrass_invariants(E)
@@ -329,6 +328,7 @@ cdef object compute_inert_trace(mpz_t Ax, mpz_t Ay, mpz_t Bx, mpz_t By, long p):
         return None
     
     from psage.number_fields.sqrt5.misc import F
+    from psage.modform.hilbert.sqrt5.sqrt5_fast import ResidueRing
     
     cdef ResidueRing_abstract R = ResidueRing(F.ideal([p]), 1)
     cdef residue_element a4, a6, x, z, w

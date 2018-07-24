@@ -1234,7 +1234,7 @@ class LSeriesAbstract(object):
 
     def _symbolic_(self, R, bound=10, prec=None):
         """
-        Convert self into the symbolic ring as a truncated Dirichleter series, including
+        Convert self into the symbolic ring as a truncated Dirichlet series, including
         terms up to `n^s` where n=bound.
 
         EXAMPLES::
@@ -2097,6 +2097,43 @@ class LSeriesDirichletCharacter(LSeriesAbstract):
         if prec is not None:
             a = ComplexField(prec)(a)
         return 1 - a*self._T
+
+class LSeriesHeckeCharacter(LSeriesDirichletCharacter):
+    """
+    """
+    def __init__(self, chi):
+        self._chi = chi
+        LSeriesAbstract.__init__(self, conductor = chi.conductor()*chi.field().conductor(),
+                                 hodge_numbers = [0,0],
+                                 weight = 1,
+                                 epsilon = None,
+                                 poles = [],  # since primitive
+                                 residues = [],  # since primitive
+                                 base_field = chi.field(),
+                                 is_selfdual = chi.order() <= 2)
+        self._T = ZZ['T'].gen()
+
+    def _cmp(self, right):
+        return cmp(self.character(), right.character())
+
+    def __repr__(self):
+        """
+        """
+        return "L-series attached to %s"%self._chi
+
+    def character(self):
+        return self._chi
+
+    def epsilon(self, prec=None):
+        return 'solve'
+
+    def _local_factor(self, P, prec):
+        q = norm(P)
+        p = prime_below(P)
+        f = ZZ(q).ord(p)
+        if prec is not None:
+            return prod(1 - ComplexField(prec)(self._chi(p))*self._T**f for p in self._primes_above(P))
+        return prod(1 - self._chi(p)*self._T**f for p in self._primes_above(P))
 
 class LSeriesModularSymbolsAbstract(LSeriesAbstract):
     def _cmp(self, right):

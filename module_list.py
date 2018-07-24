@@ -149,7 +149,8 @@ ext_modules = [
               libraries = ['gmp', 'flint'],
               language = 'c++',
 #              include_dirs = [SAGE_LOCAL + '/include/FLINT/', SAGE_ROOT + '/devel/sage/sage/libs/flint/'],
-              extra_compile_args = ['-std=c99']),
+#extra_compile_args = ['-std=c99']
+              ),
 
     Extension("psage.ellcurve.xxx.rankbound",
               sources = [   'psage/ellcurve/xxx/rankbound.pyx',
@@ -301,7 +302,7 @@ my_extensions = [
               extra_compile_args = ['-w','-O2'])
 ]
 
-ext_modules.extend(my_extensions)
+#ext_modules.extend(my_extensions)
 
 ## Stephan Ehlen's additional modules
 

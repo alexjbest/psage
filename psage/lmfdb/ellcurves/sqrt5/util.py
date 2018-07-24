@@ -51,7 +51,3 @@ def find_isogeneous_curves(ellcurves_sqrt5, E):
     from psage.modform.hilbert.sqrt5.tables import canonical_gen    
     v['level'] = str(canonical_gen(E.conductor())).replace(' ','')
     return ellcurves_sqrt5.find(v)
-
-    
-       
-    
